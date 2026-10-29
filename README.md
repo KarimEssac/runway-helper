@@ -8,9 +8,11 @@ Chrome Manifest V3 extension for https://caption-verify-ext.ext.runwayml.com/ on
 2. Clone or download this repository. Click **Load unpacked** and select its folder.
 3. Refresh the Runway tab. The speed bar appears beside its video.
 
-Drag the slider or use arrow keys while it is focused to select 0.25×–2× in 0.25× steps. Click **1×** to reset. Speed carries across clips until page refresh. Clicking the Chrome toolbar icon does nothing; there is no popup.
+Drag the slider or use arrow keys while it is focused to select 0.25×–2× in 0.25× steps. Click **1×** to reset. Each new clip starts at 1×, including when Runway changes the video without refreshing the page. Replaying or seeking within the same loaded clip keeps the chosen speed. Clicking the Chrome toolbar icon does nothing; there is no popup.
 
 The bar moves inside the video edge when space is limited. Native fullscreen retains the speed; exit fullscreen to access the custom bar again. No persistent storage, network requests, or extra extension API permissions are used.
+
+Use the two small buttons centered above the video to toggle the center guides independently: **│** for the vertical line and **─** for the horizontal line. Both start off and keep their individual on/off states across clips until refresh. The lines let clicks pass through to the video and stay centered as it resizes. Like the speed bar, the guides are available in the normal page view, outside native fullscreen.
 
 After editing the extension, click **Reload** on its card in `chrome://extensions`, then refresh Runway.
 

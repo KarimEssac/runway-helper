@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Runway Helper",
-  "version": "0.1.0",
-  "description": "A simple video playback speed control for Runway video annotation.",
+  "version": "0.2.2",
+  "description": "Video playback speed and centered alignment guides for Runway video annotation.",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",

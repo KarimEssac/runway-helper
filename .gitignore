@@ -3,3 +3,9 @@
 
 # Local screenshot of the annotation workspace
 /verification.png
+
+# .md files except README.md
+*.md
+!README.md
+!readme.md
+

@@ -1,0 +1,5 @@
+# Local test fixtures and checks
+/tests/
+
+# Local screenshot of the annotation workspace
+/verification.png

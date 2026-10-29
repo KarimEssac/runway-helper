@@ -1,8 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Runway Helper",
-  "version": "0.2.3",
-  "description": "Video playback speed and centered alignment guides for Runway video annotation.",
+  "version": "0.6.2",
+  "description": "Video controls, center guides, expanded viewing, and selected-text Google Images search for Runway annotation.",
+  "permissions": ["storage"],
+  "background": { "service_worker": "image-search/image-search-worker.js" },
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -19,7 +21,7 @@
   },
   "content_scripts": [{
     "matches": ["https://caption-verify-ext.ext.runwayml.com/*"],
-    "js": ["content.js"],
+    "js": ["image-search/image-search.js", "player-controls.js", "content.js"],
     "run_at": "document_idle",
     "all_frames": false
   }]

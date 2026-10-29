@@ -70,6 +70,7 @@
     const previousMarginTop = wrapper.style.marginTop;
     const guideMarginTop = `${(parseFloat(getComputedStyle(wrapper).marginTop) || 0) + 34}px`;
     wrapper.style.marginTop = guideMarginTop;
+    const mediaControls = new globalThis.RunwayHelperPlayerControls(video, wrapper, requestUpdate);
     const host = document.createElement('runway-helper-speed');
     host.setAttribute('aria-label', 'Runway Helper playback speed');
     const shadow = host.attachShadow({ mode: 'open' });
@@ -159,7 +160,8 @@
     function position() {
       const r = video.getBoundingClientRect();
       const p = wrapper.getBoundingClientRect();
-      const invisible = !!document.fullscreenElement || r.width === 0 || r.height === 0 ||
+      mediaControls.position();
+      const invisible = mediaControls.expanded || !!document.fullscreenElement || r.width === 0 || r.height === 0 ||
         r.bottom <= 0 || r.top >= innerHeight || getComputedStyle(video).visibility === 'hidden';
       host.hidden = invisible || r.height < 150;
       guidesHost.hidden = invisible;
@@ -189,7 +191,8 @@
     video.addEventListener('loadedmetadata', onReady);
     video.addEventListener('ratechange', onRate);
     wrapper.append(host, guidesHost);
-    const player = { video, wrapper, host, guidesHost, apply, position, renderGuides, destroy() {
+    const player = { video, wrapper, host, guidesHost, mediaControls, apply, position, renderGuides, destroy() {
+      mediaControls.destroy();
       resize.disconnect();
       slider.removeEventListener('input', onInput);
       reset.removeEventListener('click', onReset);
@@ -215,7 +218,7 @@
 
   function reconcile() {
     for (const [video, player] of players) {
-      if (!video.isConnected || video.parentElement !== player.wrapper || !player.host.isConnected || !player.guidesHost.isConnected) {
+      if (!video.isConnected || video.parentElement !== player.wrapper || !player.host.isConnected || !player.guidesHost.isConnected || !player.mediaControls.host.isConnected) {
         player.destroy();
         players.delete(video);
       }

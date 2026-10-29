@@ -1,11 +1,10 @@
 (() => {
   'use strict';
-  // Speed belongs to each clip; guides remain enabled until page refresh.
+  // Each new clip starts at normal speed with both center guides disabled.
   const marker = 'data-runway-helper';
   if (document.documentElement.hasAttribute(marker)) return;
   document.documentElement.setAttribute(marker, '');
 
-  const guidesEnabled = { vertical: false, horizontal: false };
   let scheduled = false;
   const players = new Map();
   const format = rate => `${Number(rate.toFixed(2))}×`;
@@ -97,6 +96,7 @@
       horizontal: guidesShadow.querySelector('.horizontal')
     };
     const guideToggles = Array.from(guidesShadow.querySelectorAll('button'));
+    const guidesEnabled = { vertical: false, horizontal: false };
 
     function renderGuides() {
       for (const toggle of guideToggles) {
@@ -110,7 +110,7 @@
       event.stopPropagation();
       const axis = event.currentTarget.dataset.axis;
       guidesEnabled[axis] = !guidesEnabled[axis];
-      for (const player of players.values()) player.renderGuides();
+      renderGuides();
     }
     // Keep the page's annotation shortcuts from handling button activation keys.
     function onGuideKey(event) { event.stopPropagation(); }
@@ -141,6 +141,9 @@
     function onLoad() {
       loading = true;
       selectedSpeed = 1;
+      guidesEnabled.vertical = false;
+      guidesEnabled.horizontal = false;
+      renderGuides();
       apply();
     }
     function onReady() { loading = false; apply(); requestUpdate(); }

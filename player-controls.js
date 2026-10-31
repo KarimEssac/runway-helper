@@ -137,7 +137,6 @@ globalThis.RunwayHelperPlayerControls = (() => {
       this.hudHidden = false;
       this.originalControls = video.controls;
       this.restoreExpanded = [];
-      this.clickPlaybackState = null;
       this.progressFrame = null;
       this.events = new AbortController();
       const options = { signal: this.events.signal };
@@ -176,18 +175,15 @@ globalThis.RunwayHelperPlayerControls = (() => {
       document.addEventListener('visibilitychange', animateProgress, options);
       video.addEventListener('loadstart', () => {
         this.stopProgressAnimation();
-        this.cancelVideoClick();
         this.hudHidden = false;
         this.updatePresentation();
         this.sync();
       }, options);
       video.addEventListener('emptied', () => {
-        this.cancelVideoClick();
         this.stopProgressAnimation();
         this.syncProgress();
       }, options);
       this.play.addEventListener('click', () => {
-        this.cancelVideoClick();
         this.togglePlayback();
       }, options);
       const isVideoSurface = event => {
@@ -203,32 +199,14 @@ globalThis.RunwayHelperPlayerControls = (() => {
         if (!isVideoSurface(event)) return;
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (event.detail > 1) return;
-        this.clickPlaybackState = {
-          paused: video.paused || video.ended,
-          time: video.currentTime,
-          expanded: this.expanded
-        };
         this.togglePlayback();
       }, { capture: true, signal: this.events.signal });
       wrapper.addEventListener('dblclick', event => {
         if (!isVideoSurface(event)) return;
+        // Keep double clicks from triggering the page's expansion handlers.
         event.preventDefault();
         event.stopImmediatePropagation();
-        const initial = this.clickPlaybackState;
-        this.cancelVideoClick();
-        // Undo the first click's playback action when it becomes a double click.
-        if (initial) {
-          if (initial.paused) {
-            video.pause();
-            if (Number.isFinite(initial.time)) {
-              try { video.currentTime = initial.time; } catch { /* The source may no longer be seekable. */ }
-            }
-          } else if (video.paused) this.togglePlayback();
-        }
-        this.setExpanded(!(initial?.expanded ?? this.expanded));
       }, { capture: true, signal: this.events.signal });
-      this.host.addEventListener('pointerdown', () => this.cancelVideoClick(), options);
       this.seek.addEventListener('input', () => {
         if (Number.isFinite(video.duration) && video.duration > 0) {
           try { video.currentTime = Math.min(video.duration, Number(this.seek.value)); }
@@ -277,10 +255,6 @@ globalThis.RunwayHelperPlayerControls = (() => {
       wrapper.append(this.host);
       this.sync();
       this.startProgressAnimation();
-    }
-
-    cancelVideoClick() {
-      this.clickPlaybackState = null;
     }
 
     togglePlayback() {
@@ -345,7 +319,6 @@ globalThis.RunwayHelperPlayerControls = (() => {
     }
 
     setExpanded(expanded) {
-      this.cancelVideoClick();
       if (expanded === this.expanded) return;
       if (expanded) {
         if (activePlayer) activePlayer.setExpanded(false);
@@ -403,7 +376,6 @@ globalThis.RunwayHelperPlayerControls = (() => {
     }
 
     destroy() {
-      this.cancelVideoClick();
       this.setExpanded(false);
       this.events.abort();
       this.stopProgressAnimation();

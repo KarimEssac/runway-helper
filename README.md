@@ -20,7 +20,7 @@ Play/pause, playback time, seeking, mute, volume, and Expand are in a dedicated 
 
 Click **Expand video** to fill the browser's page area. This uses an in-page expanded layout, so it does not invoke Chrome's fullscreen API or its exit-fullscreen notice. The browser toolbar remains visible. Chrome's own notice cannot be suppressed in native fullscreen.
 
-Single left-click the video picture to play or pause immediately. Double-click to expand; double-click again in expanded view to return to the normal layout. The expanded background also accepts these gestures, and double-clicking restores the playback state from before the first click. The controls below the video keep their usual actions.
+Single left-click the video picture to play or pause immediately. Use the **Expand video** and **Exit expanded view** buttons to change the viewing mode; **Esc** also exits expanded view. Double-clicking does not expand or collapse the video. The controls below the video keep their usual actions.
 
 On tasks with a highlighted clip timeline, its playhead and progress fill move smoothly with the actual playback position. The highlighted area and the site's existing click/drag seeking behavior are preserved. The extension's playback slider is also updated every animation frame while playing. Animation stops when paused or the page is hidden and resumes when playback is visible again.
 

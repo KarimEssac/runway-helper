@@ -132,6 +132,7 @@ globalThis.RunwayHelperPlayerControls = (() => {
     constructor(video, wrapper, onLayout) {
       this.video = video;
       this.wrapper = wrapper;
+      wrapper.setAttribute('data-runway-helper-player', '');
       this.onLayout = onLayout;
       this.expanded = false;
       this.hudHidden = false;
@@ -382,6 +383,7 @@ globalThis.RunwayHelperPlayerControls = (() => {
       this.taskTimeline.destroy();
       this.controlsObserver.disconnect();
       this.host.remove();
+      this.wrapper.removeAttribute('data-runway-helper-player');
       this.video.controls = this.originalControls;
       if (this.wrapper.style.marginBottom === this.marginBottom) this.wrapper.style.marginBottom = this.previousMarginBottom;
     }

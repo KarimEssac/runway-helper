@@ -3,6 +3,21 @@
   'use strict';
   if (globalThis.runwayHelperDoubleClickGuard) return;
   globalThis.runwayHelperDoubleClickGuard = true;
+  const clickHandlers = new WeakMap();
+  globalThis.runwayHelperVideoClickHandlers = clickHandlers;
+
+  // Handle every click, regardless of its click count, before Runway's handlers.
+  window.addEventListener('click', event => {
+    if (event.button !== 0) return;
+    for (const node of event.composedPath()) {
+      const handler = clickHandlers.get(node);
+      if (!handler || !handler.accepts(event)) continue;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      handler.toggle();
+      return;
+    }
+  }, { capture: true, passive: false });
 
   function isVideoSurface(event) {
     const path = event.composedPath();
@@ -14,12 +29,16 @@
       (node instanceof Element && node.hasAttribute('data-runway-helper-player')));
   }
 
-  const blockDoubleClick = event => {
-    if (event.button !== 0 || (event.type !== 'dblclick' && event.detail < 2) || !isVideoSurface(event)) return;
+  window.addEventListener('dblclick', event => {
+    if (event.button !== 0 || !isVideoSurface(event)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-  };
-  for (const type of ['mousedown', 'mouseup', 'click', 'dblclick']) {
-    window.addEventListener(type, blockDoubleClick, { capture: true, passive: false });
+  }, { capture: true, passive: false });
+
+  // Suppress the page's multi-click mouse handlers without cancelling click events.
+  for (const type of ['mousedown', 'mouseup']) {
+    window.addEventListener(type, event => {
+      if (event.button === 0 && event.detail > 1 && isVideoSurface(event)) event.stopImmediatePropagation();
+    }, { capture: true });
   }
 })();

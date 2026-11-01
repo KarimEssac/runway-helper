@@ -20,7 +20,7 @@ Play/pause, playback time, seeking, mute, volume, and Expand are in a dedicated 
 
 Click **Expand video** to fill the browser's page area. This uses an in-page expanded layout, so it does not invoke Chrome's fullscreen API or its exit-fullscreen notice. The browser toolbar remains visible. Chrome's own notice cannot be suppressed in native fullscreen.
 
-Single left-click the video picture to play or pause immediately. Use the **Expand video** and **Exit expanded view** buttons to change the viewing mode; **Esc** also exits expanded view. An early page-level handler blocks double-click gestures and their second clicks on the video surface before Runway's handlers receive them. The controls below the video keep their usual actions. After upgrading, reload the extension and fully refresh the Runway tab to install this handler.
+Every left-click on the video picture toggles play/pause immediately, including rapid repeated clicks in the same position. Use the **Expand video** and **Exit expanded view** buttons to change the viewing mode; **Esc** also exits expanded view. An early page-level handler routes every video click to playback and blocks the separate double-click expansion event. The controls below the video keep their usual actions. After upgrading, reload the extension and fully refresh the Runway tab to install this handler.
 
 On tasks with a highlighted clip timeline, its playhead and progress fill move smoothly with the actual playback position. The highlighted area and the site's existing click/drag seeking behavior are preserved. The extension's playback slider is also updated every animation frame while playing. Animation stops when paused or the page is hidden and resumes when playback is visible again.
 

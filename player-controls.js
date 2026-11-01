@@ -196,6 +196,9 @@ globalThis.RunwayHelperPlayerControls = (() => {
           node === this.host || node.matches('button, input, select, textarea, a, [contenteditable]:not([contenteditable="false"]), runway-helper-speed, runway-helper-guides')
         ));
       };
+      this.guardedVideoClick = { accepts: isVideoSurface, toggle: () => this.togglePlayback() };
+      globalThis.runwayHelperVideoClickHandlers?.set(wrapper, this.guardedVideoClick);
+      // Fallback when the early handler is unavailable; otherwise it consumes the click first.
       wrapper.addEventListener('click', event => {
         if (!isVideoSurface(event)) return;
         event.preventDefault();
@@ -377,6 +380,8 @@ globalThis.RunwayHelperPlayerControls = (() => {
     }
 
     destroy() {
+      const clickHandlers = globalThis.runwayHelperVideoClickHandlers;
+      if (clickHandlers?.get(this.wrapper) === this.guardedVideoClick) clickHandlers.delete(this.wrapper);
       this.setExpanded(false);
       this.events.abort();
       this.stopProgressAnimation();

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Runway Helper",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "Video controls, center guides, expanded viewing, and selected-text Google Images search for Runway annotation.",
   "permissions": ["storage"],
   "background": { "service_worker": "image-search/image-search-worker.js" },

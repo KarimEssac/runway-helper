@@ -31,10 +31,23 @@ globalThis.RunwayHelperPlayerControls = (() => {
     button:hover { background: #2c4d70; }
     input { accent-color: #419aff; cursor: pointer; }
     :is(input,button):focus-visible { outline: 2px solid #83c1ff; outline-offset: 2px; }
-    output { white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 11px; }
+    output { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-variant-numeric: tabular-nums; font-size: 11px; }
     .spacer { flex: 1; }
-    .volume { width: 70px; min-width: 0; margin: 0; }
-    @container (max-width: 360px) { .volume { display: none; } }
+    .volume { width: 70px; min-width: 44px; margin: 0; }
+    @container (max-width: 270px) {
+      .hud { display: grid; grid-template-columns: min(28px, 24%) minmax(0, 1fr) repeat(2, min(28px, 24%));
+        grid-template-rows: 20px 28px; gap: 5px 4px; align-items: center; }
+      .row { display: contents; }
+      button, button svg { max-width: 100%; }
+      .spacer { display: none; }
+      .seek { grid-area: 1 / 1 / 2 / 3; margin: 0; min-width: 0; }
+      .volume { grid-area: 1 / 3 / 2 / 5; width: 100%; min-width: 0; }
+      .play { grid-area: 2 / 1; }
+      output { grid-area: 2 / 2; }
+      .mute { grid-area: 2 / 3; }
+      .expand { grid-area: 2 / 4; }
+    }
     .notice { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   `;
 

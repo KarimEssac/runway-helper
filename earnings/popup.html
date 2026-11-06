@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Runway Helper Earnings</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="earnings.js" defer></script>
+  <script src="popup.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>Runway earnings</h1>
+
+    <section class="period" aria-label="Earnings summary">
+      <label for="period">Period</label>
+      <select id="period">
+        <option value="today">Today</option>
+        <option value="day">Another day</option>
+        <option value="range">Custom time range</option>
+      </select>
+      <label id="day-fields" class="date-fields" hidden>Workday starting on <input type="date" id="day"></label>
+      <div id="range-fields" class="date-fields" hidden>
+        <label>From <input type="datetime-local" id="from"></label>
+        <label>Until <input type="datetime-local" id="until"></label>
+      </div>
+      <output id="amount" aria-label="Estimated earnings">…</output>
+      <p id="breakdown" class="muted"></p>
+      <div class="performance">
+        <div class="performance-row">
+          <label for="effective-rate">Effective hourly rate</label>
+          <output id="effective-rate">—</output>
+        </div>
+        <p id="active-time" class="muted"></p>
+        <div class="timer-controls" role="group" aria-label="Task timer controls">
+          <button id="timer-toggle" type="button" disabled>Pause</button>
+          <button id="timer-stop" type="button" disabled title="Stop and clear the current task timer">Stop</button>
+          <span id="timer-status" class="muted" role="status"></span>
+        </div>
+      </div>
+    </section>
+
+    <form id="settings">
+      <fieldset id="preferences" disabled>
+        <legend>Earnings settings</legend>
+        <label for="rate">Hourly rate (USD)</label>
+        <input id="rate" type="number" min="0" step="0.01" placeholder="e.g. 20.00">
+        <label for="goal">Today's goal (USD, optional)</label>
+        <input id="goal" type="number" min="0.01" step="0.01" placeholder="e.g. 50.00" aria-describedby="goal-help">
+        <p id="goal-help" class="muted">Applies until the next daily reset. Leave blank to hide the progress ring.</p>
+        <label for="reset-hour">Daily reset time</label>
+        <div class="time" role="group" aria-label="Daily reset time">
+          <input id="reset-hour" type="number" min="1" max="12" step="1" aria-label="Hour" required>
+          <span aria-hidden="true">:</span>
+          <input id="reset-minute" type="number" min="0" max="59" step="1" aria-label="Minute" required>
+          <select id="reset-meridiem" aria-label="AM or PM"><option>AM</option><option>PM</option></select>
+        </div>
+        <p class="muted">Uses this computer’s local time. Past workdays follow the current reset time and hourly rate.</p>
+        <button id="save" type="submit">Save settings</button>
+        <p id="status" class="muted" role="status"></p>
+      </fieldset>
+    </form>
+    <p class="rule">One paid hour equals 360 standard or 180 highlighted tasks.</p>
+  </main>
+</body>
+</html>

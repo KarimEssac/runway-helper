@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Runway Helper",
-  "version": "0.6.5",
-  "description": "Video controls, center guides, expanded viewing, and selected-text Google Images search for Runway annotation.",
+  "version": "1.0.0",
+  "description": "Earnings tracking, video controls, and selected-text Google Images search for Runway annotation.",
   "permissions": ["storage"],
-  "background": { "service_worker": "image-search/image-search-worker.js" },
+  "background": { "service_worker": "background.js" },
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -13,6 +13,7 @@
   },
   "action": {
     "default_title": "Runway Helper",
+    "default_popup": "earnings/popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",
       "24": "icons/icon-24.png",
@@ -21,7 +22,7 @@
   },
   "content_scripts": [{
     "matches": ["https://caption-verify-ext.ext.runwayml.com/*"],
-    "js": ["video-interactions.js"],
+    "js": ["video-interactions.js", "earnings/earnings.js", "earnings/tracker.js"],
     "run_at": "document_start",
     "all_frames": false
   }, {

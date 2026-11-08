@@ -20,11 +20,11 @@ Click the Chrome toolbar icon, enter your hourly rate in USD, choose a daily res
 
 One paid hour equals 360 tasks with no highlighted area or 180 with a highlighted area. The extension starts tracking after you reload it and refresh Runway. It records a task when you use **Confirm** and Runway’s completed-task total goes up, including when Runway reuses the video for another claim. Task history and settings stay in local extension storage. Changing your rate or reset time recalculates the display using the saved task history.
 
-Set **Today's goal** in the toolbar popup to show a progress ring on the bottom-right counter. The ring fills from gray to green and turns gold above 100%. The goal applies until the next daily reset. Leave the field blank to hide the ring.
+Set a **Daily goal** in the toolbar popup and click **Save settings** to show a progress ring on the bottom-right counter. The ring fills from gray to green and turns gold above 100%. Progress resets each workday and the goal carries over. Clear the field and save to remove the goal.
 
-**Effective hourly rate** divides earnings from timed tasks by the time spent on those tasks in the selected period. Timing starts when a claim appears in the focused Runway tab and pauses when you switch tabs or apps. Only confirmed tasks count. Older earnings still appear in the total, and the effective rate uses tasks timed after this update.
+**Effective hourly rate** divides earnings from the current stopwatch session by the elapsed time on the stopwatch. Confirmed tasks count from the start of the session through **Stop**, including tasks confirmed while paused. **Reset** clears the session and begins a new one immediately if the stopwatch is running. The period selector filters the earnings total above the stopwatch.
 
-Use **Pause** and **Resume** in the toolbar popup to keep the current task's elapsed time. **Stop** clears the current task's timer. Use **Start** to begin timing again. The timer setting applies across Runway tabs and persists when you reopen Chrome.
+The stopwatch appears in the toolbar popup and below the earnings in Runway's bottom-right counter. It keeps counting through task changes and tab switches, and both popups show the same elapsed time. **Pause** holds the time for **Resume**. **Stop** holds the final time until you start again. **Reset** zeros the time and keeps counting if the stopwatch was running.
 
 ## Unobstructed playback and expanded view
 

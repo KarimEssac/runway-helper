@@ -42,12 +42,14 @@ output {
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
-.performance { border-top: 1px solid #394451; margin-top: 10px; padding-top: 8px; }
+.performance, .timer { border-top: 1px solid #394451; margin-top: 10px; padding-top: 8px; }
 .performance-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 #effective-rate { margin: 0; font-size: 16px; text-align: right; }
-#active-time { margin-top: 2px; }
-.timer-controls { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+#session-earnings { margin-top: 2px; }
+.timer-controls { display: flex; align-items: center; gap: 6px; }
+.timer-controls [role="timer"] { margin-right: auto; font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .timer-controls button { margin: 0; padding: 4px 8px; }
+.timer-error:not(:empty) { margin-top: 6px; }
 
 fieldset { border: 0; margin: 14px 0 0; padding: 0; }
 legend { font-size: 14px; font-weight: 700; padding: 0; margin-bottom: 8px; }

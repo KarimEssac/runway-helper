@@ -1,7 +1,10 @@
 (() => {
   'use strict';
 
-  const { SETTINGS_KEY, TIMER_MODE_KEY, usd, pad, localDate, dayRange, currentDay, summary, watch } = globalThis.RunwayHelperEarnings;
+  const {
+    SETTINGS_KEY, usd, pad, localDate, dayRange, currentDay, summary,
+    timerElapsed, timerSessionStart, bindTimer, watch
+  } = globalThis.RunwayHelperEarnings;
   const field = id => document.getElementById(id);
   const period = field('period');
   const day = field('day');
@@ -10,10 +13,8 @@
   const amount = field('amount');
   const breakdown = field('breakdown');
   const effectiveRate = field('effective-rate');
-  const activeTime = field('active-time');
-  const timerToggle = field('timer-toggle');
-  const timerStop = field('timer-stop');
-  const timerStatus = field('timer-status');
+  const sessionDetail = field('session-earnings');
+  const renderTimer = bindTimer(field('timer'), renderEffectiveRate);
   const rateInput = field('rate');
   const goalInput = field('goal');
   const hour = field('reset-hour');
@@ -22,44 +23,40 @@
   const status = field('status');
   let data;
   let settings;
+  let sessionEarnings = null;
   let editing = false;
   let editingGoal = false;
-  let savingTimer = false;
   let rollover;
 
   function localDateTime(date) {
     return `${localDate(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   }
 
-  function formatActiveTime(ms) {
-    const seconds = Math.floor(ms / 1000);
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor(seconds / 60) % 60;
-    if (!seconds) return '<1s';
-    return [hours && `${hours}h`, minutes && `${minutes}m`, `${seconds % 60}s`].filter(Boolean).join(' ');
+  function renderEffectiveRate(elapsed) {
+    const value = sessionEarnings !== null && elapsed >= 1000
+      ? `${usd.format(sessionEarnings / (elapsed / 3_600_000))}/hr`
+      : '—';
+    if (effectiveRate.textContent !== value) effectiveRate.textContent = value;
   }
 
-  function renderTimerControls() {
-    const { timerMode } = settings;
-    timerToggle.textContent = timerMode === 'running' ? 'Pause' : timerMode === 'paused' ? 'Resume' : 'Start';
-    timerToggle.disabled = savingTimer;
-    timerStop.disabled = savingTimer || timerMode === 'stopped';
-    timerStatus.textContent = timerMode === 'running' ? 'Timing on' : timerMode === 'paused' ? 'Paused' : 'Stopped';
-  }
-
-  async function setTimerMode(timerMode) {
-    savingTimer = true;
-    renderTimerControls();
-    try {
-      await chrome.storage.local.set({ [TIMER_MODE_KEY]: timerMode });
-    } catch {
-      savingTimer = false;
-      renderTimerControls();
-      timerStatus.textContent = 'Could not update timer.';
-      return;
+  function renderSession() {
+    const { timer, rate } = settings;
+    const start = timerSessionStart(timer);
+    const elapsed = timerElapsed(timer);
+    sessionEarnings = null;
+    if (start === null) {
+      sessionDetail.textContent = elapsed > 0
+        ? 'Reset the stopwatch to measure a new session.'
+        : 'Start the stopwatch to measure a session.';
+    } else if (rate === null) {
+      sessionDetail.textContent = 'Set your hourly rate to see session earnings.';
+    } else {
+      const { hours } = summary(data, { start, end: timer.stoppedAt ?? Infinity });
+      sessionEarnings = hours * rate;
+      sessionDetail.textContent = `${usd.format(sessionEarnings)} earned this stopwatch session`;
     }
-    savingTimer = false;
-    renderTimerControls();
+    renderEffectiveRate(elapsed);
+    renderTimer(timer);
   }
 
   function render() {
@@ -68,7 +65,7 @@
     const now = new Date();
     const workday = currentDay(now, resetMinutes);
     const today = dayRange(workday, resetMinutes);
-    if (!editingGoal) goalInput.value = goal?.day === workday ? goal.dollars : '';
+    if (!editingGoal) goalInput.value = goal ?? '';
     clearTimeout(rollover);
     rollover = setTimeout(render, Math.min(60_000, Math.max(1, today.end - now)));
 
@@ -78,18 +75,12 @@
     if (!(range.start < range.end)) {
       amount.textContent = '—';
       breakdown.textContent = 'Choose a valid date or a range with an end after its start.';
-      effectiveRate.textContent = '—';
-      activeTime.textContent = '';
       return;
     }
 
-    const { hours, highlighted, standard, timedTasks, timedHours, activeMs } = summary(data, range);
+    const { hours, highlighted, standard } = summary(data, range);
     amount.textContent = rate === null ? '—' : usd.format(hours * rate);
     breakdown.textContent = `${standard} standard · ${highlighted} highlighted${rate === null ? ' · Set your hourly rate' : ''}`;
-    effectiveRate.textContent = rate !== null && activeMs > 0 ? `${usd.format(timedHours * rate / (activeMs / 3_600_000))}/hr` : '—';
-    activeTime.textContent = timedTasks
-      ? `${formatActiveTime(activeMs)} active · ${timedTasks} timed ${timedTasks === 1 ? 'task' : 'tasks'}`
-      : 'No timed tasks in this period';
   }
 
   function changePeriod() {
@@ -110,10 +101,9 @@
   watch((newData, newSettings) => {
     const initial = !settings;
     const changed = initial || settings.rate !== newSettings.rate || settings.resetMinutes !== newSettings.resetMinutes;
-    const timerChanged = initial || settings.timerMode !== newSettings.timerMode;
     data = newData;
     settings = newSettings;
-    if (timerChanged) renderTimerControls();
+    renderSession();
     if (changed && !editing) {
       const resetHour = Math.floor(settings.resetMinutes / 60);
       rateInput.value = settings.rate ?? '';
@@ -129,8 +119,6 @@
     breakdown.textContent = 'Earnings storage is unavailable.';
   });
 
-  timerToggle.addEventListener('click', () => void setTimerMode(settings.timerMode === 'running' ? 'paused' : 'running'));
-  timerStop.addEventListener('click', () => void setTimerMode('stopped'));
   period.addEventListener('change', changePeriod);
   for (const input of [day, from, until]) input.addEventListener('input', render);
   field('settings').addEventListener('input', () => {
@@ -146,13 +134,7 @@
     const resetHour = hour.valueAsNumber % 12 + (meridiem.value === 'PM' ? 12 : 0);
     const rate = rateInput.value === '' ? null : rateInput.valueAsNumber;
     const resetMinutes = resetHour * 60 + minute.valueAsNumber;
-    let goal = settings.goal;
-    if (editingGoal) {
-      goal = goalInput.value === '' ? null : {
-        day: currentDay(new Date(), resetMinutes),
-        dollars: goalInput.valueAsNumber
-      };
-    }
+    const goal = goalInput.value === '' ? null : goalInput.valueAsNumber;
     const save = field('save');
     save.disabled = true;
     try {

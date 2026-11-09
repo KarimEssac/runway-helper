@@ -16,7 +16,7 @@ Use the two small buttons centered above the video to toggle the center guides i
 
 ## Earnings
 
-Click the Chrome toolbar icon, enter your hourly rate in USD, choose a daily reset time in AM or PM, and click **Save settings**. The reset defaults to midnight in your computer’s local time. The popup opens to the current workday. Select **Another day** to see the workday that started on that date, or **Custom time range** to set a start and end on your local clock. The bottom-right counter on Caption Verify always shows the current workday.
+Click the Chrome toolbar icon, enter your hourly rate in USD, choose a daily reset time in AM or PM, and click **Save settings**. The reset defaults to midnight in your computer’s local time. The popup opens to the current workday. Select **Another day** to see the workday that started on that date. Under **Custom time range**, enter dates manually or choose a half-month with recorded work under **Work periods**. Presets cover days 1–15 and 16 through the end of the month, using your daily reset time. The bottom-right counter on Caption Verify always shows the current workday.
 
 One paid hour equals 360 tasks with no highlighted area or 180 with a highlighted area. The extension starts tracking after you reload it and refresh Runway. It records a task when you use **Confirm** and Runway’s completed-task total goes up, including when Runway reuses the video for another claim. Task history and settings stay in local extension storage. Changing your rate or reset time recalculates the display using the saved task history.
 

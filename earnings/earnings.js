@@ -30,21 +30,42 @@ globalThis.RunwayHelperEarnings = (() => {
     return localDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
   }
 
+  function* loggedTasks(data) {
+    for (const [key, batch] of Object.entries(data)) {
+      if (key.startsWith(LOG_PREFIX)) yield* Object.values(batch);
+    }
+  }
+
   function summary(data, { start, end }) {
     let highlighted = 0;
     let standard = 0;
     const from = +start;
     const until = +end;
-    for (const [key, batch] of Object.entries(data)) {
-      if (!key.startsWith(LOG_PREFIX)) continue;
-      for (const [at, hasHighlight] of Object.values(batch)) {
-        if (at >= from && at < until) {
-          if (hasHighlight) highlighted++;
-          else standard++;
-        }
+    for (const [at, hasHighlight] of loggedTasks(data)) {
+      if (at >= from && at < until) {
+        if (hasHighlight) highlighted++;
+        else standard++;
       }
     }
     return { highlighted, standard, hours: (standard + 2 * highlighted) / 360 };
+  }
+
+  function halfMonthRanges(data, resetMinutes) {
+    const starts = new Set();
+    for (const [at] of loggedTasks(data)) {
+      const workday = currentDay(new Date(at), resetMinutes);
+      const firstHalf = Number(workday.slice(-2)) <= 15;
+      starts.add(`${workday.slice(0, -2)}${firstHalf ? '01' : '16'}`);
+    }
+
+    return [...starts].sort().reverse().map(id => {
+      const [year, month, first] = id.split('-').map(Number);
+      const last = first === 1 ? 15 : new Date(year, month, 0).getDate();
+      const start = dayRange(id, resetMinutes).start;
+      const end = dayRange(`${year}-${pad(month)}-${last}`, resetMinutes).end;
+      const monthLabel = start.toLocaleString('en', { month: 'short' });
+      return { id, start, end, label: `${monthLabel} ${first}–${last}, ${year}` };
+    });
   }
 
   function timerElapsed(timer, now = Date.now()) {
@@ -154,6 +175,6 @@ globalThis.RunwayHelperEarnings = (() => {
 
   return {
     SETTINGS_KEY, TIMER_KEY, LOG_PREFIX, RECORD_TASK, CONTROL_TIMER, INITIAL_TIMER,
-    usd, pad, localDate, dayRange, currentDay, summary, timerElapsed, timerSessionStart, bindTimer, watch
+    usd, pad, localDate, dayRange, currentDay, summary, halfMonthRanges, timerElapsed, timerSessionStart, bindTimer, watch
   };
 })();

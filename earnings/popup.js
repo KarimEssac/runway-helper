@@ -2,12 +2,13 @@
   'use strict';
 
   const {
-    SETTINGS_KEY, usd, pad, localDate, dayRange, currentDay, summary,
+    SETTINGS_KEY, usd, pad, localDate, dayRange, currentDay, summary, halfMonthRanges,
     timerElapsed, timerSessionStart, bindTimer, watch
   } = globalThis.RunwayHelperEarnings;
   const field = id => document.getElementById(id);
   const period = field('period');
   const day = field('day');
+  const preset = field('range-preset');
   const from = field('from');
   const until = field('until');
   const amount = field('amount');
@@ -23,6 +24,7 @@
   const status = field('status');
   let data;
   let settings;
+  let ranges;
   let sessionEarnings = null;
   let editing = false;
   let editingGoal = false;
@@ -30,6 +32,26 @@
 
   function localDateTime(date) {
     return `${localDate(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  function applyPreset() {
+    const range = ranges.get(preset.value);
+    if (!range) return;
+    from.value = localDateTime(range.start);
+    until.value = localDateTime(range.end);
+  }
+
+  function refreshPresets() {
+    const selected = preset.value;
+    const options = halfMonthRanges(data, settings.resetMinutes);
+    ranges = new Map(options.map(range => [range.id, range]));
+    field('preset-field').hidden = options.length === 0;
+    preset.replaceChildren(new Option('Enter dates manually', ''),
+      ...options.map(range => new Option(range.label, range.id)));
+    if (ranges.has(selected)) {
+      preset.value = selected;
+      applyPreset();
+    }
   }
 
   function renderEffectiveRate(elapsed) {
@@ -103,6 +125,7 @@
     const changed = initial || settings.rate !== newSettings.rate || settings.resetMinutes !== newSettings.resetMinutes;
     data = newData;
     settings = newSettings;
+    refreshPresets();
     renderSession();
     if (changed && !editing) {
       const resetHour = Math.floor(settings.resetMinutes / 60);
@@ -120,7 +143,17 @@
   });
 
   period.addEventListener('change', changePeriod);
-  for (const input of [day, from, until]) input.addEventListener('input', render);
+  day.addEventListener('input', render);
+  preset.addEventListener('change', () => {
+    applyPreset();
+    render();
+  });
+  for (const input of [from, until]) {
+    input.addEventListener('input', () => {
+      preset.value = '';
+      render();
+    });
+  }
   field('settings').addEventListener('input', () => {
     editing = true;
     status.textContent = '';
